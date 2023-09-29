@@ -16,6 +16,10 @@ class BotBehaviour(
                 reply(it) { regular("asdfasdf") }
             }
 
+            onCommand("asdfas"){
+
+            }
+
             setMyCommands(getBaseCommands())
         }.join()
     }
