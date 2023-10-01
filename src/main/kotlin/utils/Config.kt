@@ -14,6 +14,8 @@ object Config {
     object TelegramConfig {
         val telegramToken: String =
             dotEnv["TELEGRAM_TOKEN"] ?: error("TELEGRAM_TOKEN not found in environment variables.")
+        val telegramChannelId: Long =
+            (dotEnv["TELEGRAM_CHANNEL_ID"] ?: error("TELEGRAM_TOKEN not found in environment variables.")).toLong()
     }
 }
 
