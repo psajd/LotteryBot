@@ -1,6 +1,7 @@
 import dev.inmo.tgbotapi.bot.TelegramBot
 import dev.inmo.tgbotapi.extensions.api.bot.setMyCommands
 import dev.inmo.tgbotapi.extensions.api.chat.get.getChat
+import dev.inmo.tgbotapi.extensions.api.chat.get.getChatAdministrators
 import dev.inmo.tgbotapi.extensions.api.chat.members.getChatMember
 import dev.inmo.tgbotapi.extensions.api.send.reply
 import dev.inmo.tgbotapi.extensions.api.send.sendMessage
@@ -9,6 +10,8 @@ import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onComman
 import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onContact
 import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onDataCallbackQuery
 import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onText
+import dev.inmo.tgbotapi.extensions.utils.*
+import dev.inmo.tgbotapi.extensions.utils.extensions.raw.contact
 import dev.inmo.tgbotapi.extensions.utils.extensions.raw.from
 import dev.inmo.tgbotapi.extensions.utils.types.buttons.*
 import dev.inmo.tgbotapi.types.*
@@ -29,10 +32,14 @@ import dev.inmo.tgbotapi.utils.row
 import dev.inmo.tgbotapi.utils.toJson
 import utils.Messages
 suspend fun check(usId: UserId, cyId: IdChatIdentifier, bot:TelegramBot): Boolean {
-    if(bot.getChatMember(cyId.toChatId(),usId).user.id != usId){
-        return false;
+
+    if(bot.getChatMember(cyId.toChatId(),usId).ownerChatMemberOrNull() != null || bot.getChatMember(cyId.toChatId(),usId).memberChatMemberOrNull() != null){
+        println(cyId)
+        println(bot.getChatMember(cyId.toChatId(),usId).memberChatMemberOrNull())
+        println(usId.userLink)
+        return true;
     }
-    return true;
+    return false;
 }
 
 class BotBehaviour(
@@ -62,7 +69,7 @@ class BotBehaviour(
             }
 
             onText {
-                if(check(it.from!!.id,bot.getChat(ChatId( -1001821814522)).id,bot)){
+                if(check(it.chat.id.toChatId(),bot.getChat(ChatId( -1001821814522)).id,bot)){
                     when (it.content.text) {
                         "Принять участие" -> reply(it) { regular(Messages.startMessage) }
 
@@ -70,7 +77,7 @@ class BotBehaviour(
                 } else {
                     dataQuery = CallbackDataInlineKeyboardButton("Проверить подписку", it.from!!.id.toString())
                     print(dataQuery.callbackData)
-                        var inlineKeyboardButton = InlineKeyboardMarkup(URLInlineKeyboardButton("Подпишись","https://t.me/+Ima3S3ui4Y9kMTAy"),
+                        var inlineKeyboardButton = InlineKeyboardMarkup(URLInlineKeyboardButton("Подпишись","https://t.me/sdjghasjdha"),
                             dataQuery)
                         bot.sendMessage(it.chat.id,Messages.channelMessage,parseMode = null,
                             disableWebPagePreview = false,threadId = null,
@@ -80,7 +87,7 @@ class BotBehaviour(
                 }
             onDataCallbackQuery{
                 if(!check(it.from.id,bot.getChat(ChatId( -1001821814522)).id,bot)){
-                    var inlineKeyboardButton = InlineKeyboardMarkup(URLInlineKeyboardButton("Подпишись","https://t.me/+Ima3S3ui4Y9kMTAy"),
+                    var inlineKeyboardButton = InlineKeyboardMarkup(URLInlineKeyboardButton("Подпишись","https://t.me/sdjghasjdha"),
                         dataQuery)
                     bot.sendMessage(it.from.id,Messages.channelMessage,parseMode = null,
                         disableWebPagePreview = false,threadId = null,
