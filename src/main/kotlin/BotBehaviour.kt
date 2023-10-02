@@ -11,15 +11,21 @@ import dev.inmo.tgbotapi.types.BotCommand
 import dev.inmo.tgbotapi.types.buttons.ReplyKeyboardMarkup
 import dev.inmo.tgbotapi.types.buttons.RequestContactKeyboardButton
 import dev.inmo.tgbotapi.types.buttons.SimpleKeyboardButton
+import dev.inmo.tgbotapi.types.toChatId
 import dev.inmo.tgbotapi.utils.RiskFeature
 import dev.inmo.tgbotapi.utils.regular
 import kotlinx.coroutines.runBlocking
-import models.PersonTable
 import models.PersonTable.Person
 import repositories.PersonRepository
 import utils.Messages
+import utils.Messages.addNumberMessage
+import utils.Messages.alreadyExistsPhoneNumberMessage
+import utils.Messages.checkMessage
+import utils.Messages.finalMessage
+import utils.Messages.startMessage
+import utils.Messages.thanksMessage
 import utils.Messages.tryLotteryButton
-import java.lang.RuntimeException
+
 
 class BotBehaviour(
     private val bot: TelegramBot,
@@ -33,33 +39,51 @@ class BotBehaviour(
                     keyboard = listOf(
                         listOf(
                             SimpleKeyboardButton(tryLotteryButton),
-                            RequestContactKeyboardButton("Добавить номер телефона"),
+                            RequestContactKeyboardButton(addNumberMessage),
                         ),
                     )
                 )
-                reply(it, replyMarkup = replyMarkup) { regular(Messages.startMessage) }
+                reply(it, replyMarkup = replyMarkup) { regular(startMessage) }
             }
 
             onText {
                 doActionIfSubscribed(it, bot) {
                     runBlocking {
                         when (it.content.text) {
-                            tryLotteryButton -> reply(it) { regular(Messages.checkMessage) }
+                            tryLotteryButton -> {
+                                if (!repository.isPersonExists(
+                                        Person(
+                                           it.chat.id.chatId," "
+                                        )
+                                    )
+                                ) {
+                                    reply(it) { regular(checkMessage) }
+                                } else {
+                                    reply(it) { regular(finalMessage) }
+                                }
+                            }
+
                         }
                     }
                 }
             }
 
             onContact {
+
                 doActionIfSubscribed(it, bot) {
                     runBlocking {
-                        repository.savePerson(
-                            Person(
-                                it.contact?.userId?.chatId ?: throw RuntimeException(),
-                                it.contact?.phoneNumber ?: throw RuntimeException(),
-                            )
+                        val person = Person(
+                            it.contact?.userId?.chatId ?: throw RuntimeException(),
+                            it.contact?.phoneNumber ?: throw RuntimeException(),
                         )
-                        reply(it) { regular(Messages.thanksMessage) }
+                        if(!repository.isPersonExists(person)){
+                            repository.savePerson(person)
+                            reply(it) { regular(thanksMessage) }
+                        }
+                        else {
+                                reply(it) {regular(alreadyExistsPhoneNumberMessage)}
+                        }
+
                     }
                 }
             }
