@@ -1,4 +1,4 @@
-import BotUtils.doActionIfSubscribed
+import utils.BotUtils.doActionIfSubscribed
 import dev.inmo.tgbotapi.bot.TelegramBot
 import dev.inmo.tgbotapi.extensions.api.bot.setMyCommands
 import dev.inmo.tgbotapi.extensions.api.send.reply
@@ -10,7 +10,6 @@ import dev.inmo.tgbotapi.types.BotCommand
 import dev.inmo.tgbotapi.types.buttons.ReplyKeyboardMarkup
 import dev.inmo.tgbotapi.types.buttons.RequestContactKeyboardButton
 import dev.inmo.tgbotapi.types.buttons.SimpleKeyboardButton
-import dev.inmo.tgbotapi.utils.RiskFeature
 import dev.inmo.tgbotapi.utils.regular
 import kotlinx.coroutines.runBlocking
 import utils.Messages
