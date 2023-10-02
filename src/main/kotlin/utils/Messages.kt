@@ -49,5 +49,6 @@ object Messages {
     val tryLotteryButton = "Принять участие"
 
     val subscribeButton = "Подпишись"
-
+    val alreadyExistsPhoneNumberMessage = "Вы уже добавили номер телефона"
+    val addNumberMessage = "Добавить номер телефона"
 }
