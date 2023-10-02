@@ -13,7 +13,7 @@ repositories {
 dependencies {
     val koinVersion = "3.4.2"
     val exposedVersion = "0.41.1"
-    val h2Version = "2.2.220"
+    val h2Version = "2.1.210"
     val hikariCpVersion = "5.0.1"
     val flywayVersion = "9.17.0"
     val logbackVersion = "1.4.5"
