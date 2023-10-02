@@ -6,19 +6,26 @@ import dev.inmo.tgbotapi.extensions.behaviour_builder.buildBehaviourWithLongPoll
 import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onCommand
 import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onContact
 import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onText
+import dev.inmo.tgbotapi.extensions.utils.extensions.raw.contact
 import dev.inmo.tgbotapi.types.BotCommand
 import dev.inmo.tgbotapi.types.buttons.ReplyKeyboardMarkup
 import dev.inmo.tgbotapi.types.buttons.RequestContactKeyboardButton
 import dev.inmo.tgbotapi.types.buttons.SimpleKeyboardButton
+import dev.inmo.tgbotapi.utils.RiskFeature
 import dev.inmo.tgbotapi.utils.regular
 import kotlinx.coroutines.runBlocking
+import models.PersonTable
+import models.PersonTable.Person
+import repositories.PersonRepository
 import utils.Messages
 import utils.Messages.tryLotteryButton
+import java.lang.RuntimeException
 
 class BotBehaviour(
     private val bot: TelegramBot,
-    // TODO: доделать
+    private val repository: PersonRepository,
 ) {
+    @OptIn(RiskFeature::class)
     suspend fun startBot() {
         bot.buildBehaviourWithLongPolling {
             onCommand("start") {
@@ -46,6 +53,12 @@ class BotBehaviour(
             onContact {
                 doActionIfSubscribed(it, bot) {
                     runBlocking {
+                        repository.savePerson(
+                            Person(
+                                it.contact?.userId?.chatId ?: throw RuntimeException(),
+                                it.contact?.phoneNumber ?: throw RuntimeException(),
+                            )
+                        )
                         reply(it) { regular(Messages.thanksMessage) }
                     }
                 }
