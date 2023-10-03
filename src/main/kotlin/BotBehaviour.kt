@@ -7,6 +7,7 @@ import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onComman
 import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onContact
 import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onText
 import dev.inmo.tgbotapi.extensions.utils.extensions.raw.contact
+import dev.inmo.tgbotapi.extensions.utils.extensions.raw.from
 import dev.inmo.tgbotapi.types.BotCommand
 import dev.inmo.tgbotapi.types.buttons.ReplyKeyboardMarkup
 import dev.inmo.tgbotapi.types.buttons.RequestContactKeyboardButton
@@ -22,6 +23,8 @@ import utils.Messages.addNumberMessage
 import utils.Messages.alreadyExistsPhoneNumberMessage
 import utils.Messages.checkMessage
 import utils.Messages.finalMessage
+import utils.Messages.startCommand
+import utils.Messages.startCommandDescription
 import utils.Messages.startMessage
 import utils.Messages.thanksMessage
 import utils.Messages.tryLotteryButton
@@ -34,12 +37,12 @@ class BotBehaviour(
     @OptIn(RiskFeature::class)
     suspend fun startBot() {
         bot.buildBehaviourWithLongPolling {
-            onCommand("start") {
+            onCommand(startCommand) {
                 val replyMarkup = ReplyKeyboardMarkup(
                     keyboard = listOf(
                         listOf(
                             SimpleKeyboardButton(tryLotteryButton),
-                            RequestContactKeyboardButton(addNumberMessage),
+                            //RequestContactKeyboardButton(addNumberMessage),
                         ),
                     )
                 )
@@ -51,16 +54,7 @@ class BotBehaviour(
                     runBlocking {
                         when (it.content.text) {
                             tryLotteryButton -> {
-                                if (!repository.isPersonExists(
-                                        Person(
-                                           it.chat.id.chatId," "
-                                        )
-                                    )
-                                ) {
-                                    reply(it) { regular(checkMessage) }
-                                } else {
-                                    reply(it) { regular(finalMessage) }
-                                }
+                                reply(it) { regular(finalMessage) }
                             }
 
                         }
@@ -68,25 +62,23 @@ class BotBehaviour(
                 }
             }
 
-            onContact {
-
+           /* onContact {
                 doActionIfSubscribed(it, bot) {
                     runBlocking {
                         val person = Person(
                             it.contact?.userId?.chatId ?: throw RuntimeException(),
                             it.contact?.phoneNumber ?: throw RuntimeException(),
                         )
-                        if(!repository.isPersonExists(person)){
+                        if (!repository.isPersonExists(person)) {
                             repository.savePerson(person)
                             reply(it) { regular(thanksMessage) }
-                        }
-                        else {
-                                reply(it) {regular(alreadyExistsPhoneNumberMessage)}
+                        } else {
+                            reply(it) { regular(alreadyExistsPhoneNumberMessage) }
                         }
 
                     }
                 }
-            }
+            }*/
 
             setMyCommands(getBaseCommands())
         }.join()
@@ -94,6 +86,6 @@ class BotBehaviour(
     }
 
     private fun getBaseCommands(): List<BotCommand> = listOf(
-        BotCommand("start", "Начать работу бота")
+        BotCommand(startCommand, startCommandDescription)
     )
 }

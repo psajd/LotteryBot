@@ -19,25 +19,13 @@ class PersonRepository {
     fun isPersonExists(person: Person): Boolean {
         return transaction {
             PersonTable.select {
-                (PersonTable.userId eq userId)
+                (PersonTable.userId eq person.userId)
             }.map { row ->
                 Person(
                     userId = row[PersonTable.userId],
                     phoneNumber = row[PersonTable.phoneNumber]
                 )
             }.singleOrNull() != null
-        }
-    }
-    fun userByPhoneNumber(phoneNumber: String) {
-        return transaction {
-            PersonTable.select {
-                (PersonTable.phoneNumber eq phoneNumber)
-            }.map { row ->
-                Person(
-                    userId = row[PersonTable.userId],
-                    phoneNumber = row[PersonTable.phoneNumber]
-                )
-            }.singleOrNull()
         }
     }
 }
